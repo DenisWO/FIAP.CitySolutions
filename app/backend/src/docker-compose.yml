@@ -1,0 +1,48 @@
+version: '3.4'
+
+services:
+  fiap.citysolutions.api:
+    image: ${DOCKER_REGISTRY-}fiapcitysolutionsapi
+    container_name: fiapcitysolutionsapi
+    build:
+      context: .
+      dockerfile: FIAP.CitySolutions.API/Dockerfile
+    depends_on: 
+      - database
+    ports: 
+      - "5000:80"
+      - "5001:443" 
+    restart: always
+    environment: 
+      - DBHOST=database
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - dev 
+
+  database:
+    image: mysql:8.0.22
+    container_name: fiapcitysolutionsapi-mysqldb
+    ports:
+      - "3306:3306"
+    expose: 
+      - 3306
+    volumes:
+      - db-volume:/var/lib/mysql
+    restart: always
+    environment: 
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: fiap
+      MYSQL_PASSWORD: fiapcitysolutions
+      MYSQL_DATABASE: citysolutions
+      MYSQL_ROOT_HOST: "%"
+    networks:
+      - dev
+
+volumes:
+  db-volume:
+  
+networks:
+  dev:
+    driver: bridge
+  
+    
